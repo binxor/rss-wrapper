@@ -1,10 +1,32 @@
-let Parser = require('rss-parser'),
+'use strict';
+const Hapi = require('hapi'),
+    Parser = require('rss-parser'),
+    parser = new Parser(),
+    server = Hapi.server({
+        port: 3000,
+        host: 'localhost'
+    }),
     sw = require('remove-stopwords'),
     url = "http://feeds.reuters.com/Reuters/PoliticsNews";
-let parser = new Parser();
+    // url = "https://www.wired.com/feed/category/business/latest/rss";
 
 (async () => {
-    let feed = await parser.parseURL(url);
+    await server.start();
+    console.log(`Server running at ${server.info.uri}`)
+
+    server.route({
+        method: 'GET',
+        path: '/rssString',
+        handler: (request, h) => {
+            return run();
+        }
+    })
+
+}) ();
+
+async function run () {
+    let feed = await parser.parseURL(url),
+        ret = {};
     console.log(feed.title);
     console.log("+=============+")
     let categories = [],
@@ -18,6 +40,14 @@ let parser = new Parser();
 
     console.log(categories)
     console.log(words)
+
+    ret = {
+        categories: categories,
+        words: words,
+        feed: feed
+    }
+
+    return ret;
 
     function addCategory (item) {
         let c = item.categories;
@@ -36,4 +66,8 @@ let parser = new Parser();
         return sw.removeStopwords(title.split(" ")).join(" ");
     }
     
-})();
+}
+
+process.on('unhandledRejection', (err) => {
+    console.log(err);
+})
