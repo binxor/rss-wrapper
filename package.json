@@ -1,12 +1,12 @@
 {
-  "name": "rss_reader",
+  "name": "rss-wrapper",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A wrapper for rss-parser which provides extra fields",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "binxor",
   "license": "ISC",
   "dependencies": {
     "hapi": "^18.1.0",
