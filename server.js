@@ -7,8 +7,8 @@ const Hapi = require('hapi'),
         host: 'localhost'
     }),
     sw = require('remove-stopwords'),
-    url = "http://feeds.reuters.com/Reuters/PoliticsNews";
-    // url = "https://www.wired.com/feed/category/business/latest/rss";
+    // url = "http://feeds.reuters.com/Reuters/PoliticsNews";
+    url = "https://www.wired.com/feed/category/business/latest/rss";
 
 (async () => {
     await server.start();

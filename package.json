@@ -4,7 +4,7 @@
   "description": "A wrapper for rss-parser which provides extra fields",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node_modules/.bin/mocha"
   },
   "author": "binxor",
   "license": "ISC",
@@ -12,5 +12,10 @@
     "hapi": "^18.1.0",
     "remove-stopwords": "^1.0.3",
     "rss-parser": "^3.6.2"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.0.2",
+    "nock": "^10.0.6"
   }
 }
