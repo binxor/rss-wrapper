@@ -7,39 +7,32 @@ const Hapi = require('hapi'),
         host: 'localhost'
     }),
     sw = require('remove-stopwords'),
-    // url = "http://feeds.reuters.com/Reuters/PoliticsNews";
-    url = "https://www.wired.com/feed/category/business/latest/rss";
+    url = "http://feeds.reuters.com/Reuters/PoliticsNews";
+    // url = "https://www.wired.com/feed/category/security/latest/rss";
 
 (async () => {
     await server.start();
     console.log(`Server running at ${server.info.uri}`)
-
     server.route({
         method: 'GET',
         path: '/rssString',
         handler: (request, h) => {
-            return run();
+            return getFeed();
         }
     })
+})();
 
-}) ();
 
-async function run () {
-    let feed = await parser.parseURL(url),
-        ret = {};
-    console.log(feed.title);
-    console.log("+=============+")
+async function getFeed () {
     let categories = [],
+        feed = await parser.parseURL(url),
+        ret = {},
         words = "";
     
     feed.items.forEach( item => {
         addCategory(item)
         addWords(item)
-        console.log(item.title + "  --  " + item.categories + "\n");
     })
-
-    console.log(categories)
-    console.log(words)
 
     ret = {
         categories: categories,
@@ -47,6 +40,7 @@ async function run () {
         feed: feed
     }
 
+    console.log(words)
     return ret;
 
     function addCategory (item) {
@@ -71,3 +65,7 @@ async function run () {
 process.on('unhandledRejection', (err) => {
     console.log(err);
 })
+
+module.exports = {
+    getFeed: getFeed
+}
