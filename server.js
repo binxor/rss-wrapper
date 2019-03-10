@@ -16,6 +16,12 @@ const Hapi = require('hapi'),
     server.route({
         method: 'GET',
         path: '/rssString',
+        config: {
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
+        },
         handler: (request, h) => {
             return getFeed();
         }
