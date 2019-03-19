@@ -8,14 +8,13 @@ const Hapi = require('hapi'),
     }),
     sw = require('remove-stopwords'),
     url = "http://feeds.reuters.com/Reuters/PoliticsNews";
-    // url = "https://www.wired.com/feed/category/security/latest/rss";
 
 (async () => {
     await server.start();
     console.log(`Server running at ${server.info.uri}`)
     server.route({
         method: 'GET',
-        path: '/rssString',
+        path: '/rssString/{source?}',
         config: {
             cors: {
                 origin: ['*'],
@@ -23,15 +22,15 @@ const Hapi = require('hapi'),
             }
         },
         handler: (request, h) => {
-            return getFeed();
+            return getFeed(request.params);
         }
     })
 })();
 
 
-async function getFeed () {
+async function getFeed (params) {
     let categories = [],
-        feed = await parser.parseURL(url),
+        feed = await parser.parseURL(urlFactory(params.source)),
         ret = {},
         words = "";
     
@@ -48,6 +47,49 @@ async function getFeed () {
 
     console.log(words)
     return ret;
+
+    function urlFactory(source) {
+        let url = "";
+        switch (source) {
+            case "politics":
+                url = "http://feeds.reuters.com/Reuters/PoliticsNews";
+                break;
+            case "business":
+                url = "http://feeds.reuters.com/Reuters/BusinessNews";
+                break;
+            case "company":
+                url = "http://feeds.reuters.com/Reuters/CompanyNews";
+                break;
+            case "health":
+                url = "http://feeds.reuters.com/Reuters/healthNews";
+                break;
+            case "lifestyle":
+                url = "http://feeds.reuters.com/Reuters/lifestyle";
+                break;
+            case "odd":
+                url = "http://feeds.reuters.com/Reuters/oddlyEnoughNews";
+                break;
+            case "science":
+                url = "http://feeds.reuters.com/Reuters/scienceNews";
+                break;
+            case "security":
+                url = "https://www.wired.com/feed/category/security/latest/rss";
+                break;
+            case "technology":
+                url = "http://feeds.reuters.com/Reuters/technologyNews";
+                break;
+            case "top":
+                url = "http://feeds.reuters.com/Reuters/topNews";
+                break;
+            case "world":
+                url = "http://feeds.reuters.com/Reuters/worldNews";
+                break;
+            default: 
+                url = "http://feeds.reuters.com/Reuters/PoliticsNews";
+                break;
+        }
+        return url;
+    }
 
     function addCategory (item) {
         let c = item.categories;
