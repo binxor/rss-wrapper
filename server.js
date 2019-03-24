@@ -24,8 +24,34 @@ const Hapi = require('hapi'),
         handler: (request, h) => {
             return getFeed(request.params);
         }
+    });
+    server.route({
+        method: 'POST',
+        path: '/sentimentAnalysis',
+        config: {
+            cors: {
+                origin: ['*'],
+                additionalHeaders: ['cache-control', 'x-requested-with']
+            }
+        },
+        handler: (request, h) => {
+            return getSentiment(request)
+        }
     })
 })();
+
+ function getSentiment(r) {
+    // TODO - retrieve sentiment analysis 
+    return {
+        "SentimentScore": {
+        "Mixed": 0.013253570534288883, 
+        "Positive": 0.011843704618513584, 
+        "Neutral": 0.8014019727706909, 
+        "Negative": 0.17350070178508759
+        }, 
+        "Sentiment": "NEUTRAL"
+    };
+}
 
 
 async function getFeed (params) {
@@ -45,15 +71,11 @@ async function getFeed (params) {
         feed: feed
     }
 
-    console.log(words)
     return ret;
 
     function urlFactory(source) {
         let url = "";
         switch (source) {
-            case "politics":
-                url = "http://feeds.reuters.com/Reuters/PoliticsNews";
-                break;
             case "business":
                 url = "http://feeds.reuters.com/Reuters/BusinessNews";
                 break;
@@ -68,6 +90,9 @@ async function getFeed (params) {
                 break;
             case "odd":
                 url = "http://feeds.reuters.com/Reuters/oddlyEnoughNews";
+                break;
+            case "politics":
+                url = "http://feeds.reuters.com/Reuters/PoliticsNews";
                 break;
             case "science":
                 url = "http://feeds.reuters.com/Reuters/scienceNews";
@@ -115,5 +140,6 @@ process.on('unhandledRejection', (err) => {
 })
 
 module.exports = {
-    getFeed: getFeed
+    getFeed: getFeed,
+    getSentiment: getSentiment
 }
