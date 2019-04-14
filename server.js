@@ -56,6 +56,7 @@ const Hapi = require('hapi'),
 
 async function getFeed (params) {
     let categories = [],
+        contentSnippets = [],
         feed = await parser.parseURL(urlFactory(params.source)),
         ret = {},
         words = "";
@@ -63,12 +64,14 @@ async function getFeed (params) {
     feed.items.forEach( item => {
         addCategory(item)
         addWords(item)
+        addSnippet(item)
     })
 
     ret = {
         categories: categories,
         words: words,
-        feed: feed
+        feed: feed,
+        snippets: contentSnippets
     }
 
     return ret;
@@ -122,6 +125,13 @@ async function getFeed (params) {
             if (categories.indexOf(c[i]) < 0) {
                 categories.push(c[i]);
             }
+        }
+    }
+
+    function addSnippet (item) {
+        let s = item.contentSnippet;
+        if (s) {
+            contentSnippets.push(s);
         }
     }
 
