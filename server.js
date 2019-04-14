@@ -7,7 +7,8 @@ const Hapi = require('hapi'),
         host: 'localhost'
     }),
     sw = require('remove-stopwords'),
-    url = "http://feeds.reuters.com/Reuters/PoliticsNews";
+    url = "http://feeds.reuters.com/Reuters/PoliticsNews",
+    watson = require('./scripts/classes/Watson.js');
 
 (async () => {
     await server.start();
@@ -27,7 +28,7 @@ const Hapi = require('hapi'),
     });
     server.route({
         method: 'POST',
-        path: '/sentimentAnalysis',
+        path: '/sentiment',
         config: {
             cors: {
                 origin: ['*'],
@@ -40,28 +41,33 @@ const Hapi = require('hapi'),
     })
 })();
 
- function getSentiment(r) {
-    // TODO - retrieve sentiment analysis 
+async function getSentiment(r) {
+    //    return await watson.analyzeTone(r.payload.text); // for real watson tone analyzer response data
+    return await getSentiment0(r); // for dummy aws comprehend response data
+
+}
+
+// DUMMY DATA
+async function getSentiment0(r) { //dummy aws comprehend response data
     return {
         "SentimentScore": {
-        "Mixed": 0.013253570534288883, 
-        "Positive": 0.011843704618513584, 
-        "Neutral": 0.8014019727706909, 
-        "Negative": 0.17350070178508759
-        }, 
+            "Mixed": 0.013253570534288883,
+            "Positive": 0.011843704618513584,
+            "Neutral": 0.8014019727706909,
+            "Negative": 0.17350070178508759
+        },
         "Sentiment": "NEUTRAL"
     };
 }
 
-
-async function getFeed (params) {
+async function getFeed(params) {
     let categories = [],
         contentSnippets = [],
         feed = await parser.parseURL(urlFactory(params.source)),
         ret = {},
         words = "";
-    
-    feed.items.forEach( item => {
+
+    feed.items.forEach(item => {
         addCategory(item)
         addWords(item)
         addSnippet(item)
@@ -112,37 +118,37 @@ async function getFeed (params) {
             case "world":
                 url = "http://feeds.reuters.com/Reuters/worldNews";
                 break;
-            default: 
+            default:
                 url = "http://feeds.reuters.com/Reuters/PoliticsNews";
                 break;
         }
         return url;
     }
 
-    function addCategory (item) {
+    function addCategory(item) {
         let c = item.categories;
-        for (let i=0;i<c.length;i++) {
+        for (let i = 0; i < c.length; i++) {
             if (categories.indexOf(c[i]) < 0) {
                 categories.push(c[i]);
             }
         }
     }
 
-    function addSnippet (item) {
+    function addSnippet(item) {
         let s = item.contentSnippet;
         if (s) {
             contentSnippets.push(s);
         }
     }
 
-    function addWords (item) {
+    function addWords(item) {
         words += " " + cleanTitle(item.title)
     }
 
-    function cleanTitle (title) {
+    function cleanTitle(title) {
         return sw.removeStopwords(title.split(" ")).join(" ");
     }
-    
+
 }
 
 process.on('unhandledRejection', (err) => {
